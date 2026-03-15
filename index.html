@@ -326,9 +326,36 @@
     line-height: 1.7;
   }
   .tip-box b { color: var(--green-light); }
+
+  .home-btn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(0, 230, 118, 0.16);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.4rem;
+    border: 2px solid rgba(0, 230, 118, 0.35);
+    box-shadow: 0 0 18px rgba(0, 230, 118, 0.3);
+    transition: transform 0.15s ease, background 0.15s ease;
+    z-index: 40;
+  }
+  .home-btn:hover {
+    background: rgba(0, 230, 118, 0.28);
+    transform: translateY(-1px);
+  }
+  .home-btn:active { transform: translateY(1px); }
 </style>
 </head>
 <body>
+
+<a class="home-btn" href="https://hankaxx.github.io/homepage/" title="Zpět na výběr her">🏠</a>
 
 <h1>🐍 Babiččin Had</h1>
 <p class="subtitle">Narozeninová hra pro tu nejlepší babičku! 🎂</p>
