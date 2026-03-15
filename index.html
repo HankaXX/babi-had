@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐍 Babiččin Had</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --green: #00e676;
+    --green-dark: #00c853;
+    --green-light: #b9f6ca;
+    --snake-body: #00e676;
+    --snake-body2: #69f0ae;
+    --yellow: #ffeb3b;
+    --orange: #ff9800;
+    --red: #f44336;
+    --blue: #2196f3;
+    --pink: #e91e63;
+    --purple: #9c27b0;
+    --bg: #0d1f0d;
+    --panel: #1b3a1b;
+    --text: #f1f8e9;
+    --accent: #b2ff59;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-image: radial-gradient(ellipse at top, #1b3a1b 0%, #0d1f0d 70%);
+  }
+
+  h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.8rem;
+    color: var(--accent);
+    text-shadow: 3px 3px 0 #004d00, 0 0 30px rgba(178,255,89,0.5);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: var(--green-light);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .game-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .side-panel {
+    width: 185px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel-box {
+    background: var(--panel);
+    border: 2px solid #2e5a2e;
+    border-radius: 16px;
+    padding: 14px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+
+  .panel-box h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 0.85rem;
+    color: var(--green-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .score-val {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.4rem;
+    color: var(--yellow);
+    text-shadow: 2px 2px 0 #7a6000;
+    line-height: 1;
+  }
+
+  .highscore-val {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.6rem;
+    color: var(--orange);
+    text-shadow: 2px 2px 0 #7a4000;
+  }
+
+  .legend {
+    text-align: left;
+    font-size: 0.82rem;
+    line-height: 1.9;
+    color: var(--green-light);
+  }
+  .legend span { font-size: 1.05rem; }
+
+  .difficulty-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .diff-btn {
+    padding: 7px 10px;
+    border: 2px solid #2e5a2e;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--green-light);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .diff-btn:hover { background: #2e5a2e; color: white; }
+  .diff-btn.active {
+    background: var(--green);
+    color: #003300;
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(0,230,118,0.4);
+  }
+
+  .canvas-wrap { position: relative; }
+
+  canvas {
+    border: 3px solid #00c853;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0,230,118,0.25), 0 8px 32px rgba(0,0,0,0.6);
+    display: block;
+    background: #061206;
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: rgba(5, 15, 5, 0.93);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+  }
+
+  .overlay h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.2rem;
+    color: var(--accent);
+    text-shadow: 2px 2px 0 #004d00;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .overlay p {
+    font-size: 1rem;
+    color: var(--green-light);
+    text-align: center;
+    padding: 0 30px;
+    line-height: 1.6;
+    max-width: 380px;
+  }
+
+  .start-btn {
+    padding: 14px 36px;
+    background: var(--green);
+    color: #003300;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 0 #007700, 0 6px 20px rgba(0,230,118,0.4);
+    letter-spacing: 1px;
+  }
+
+  .start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #007700, 0 10px 24px rgba(0,230,118,0.5);
+    background: var(--accent);
+  }
+
+  .start-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #007700;
+  }
+
+  .toast {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-70px);
+    background: rgba(10, 30, 10, 0.97);
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    max-width: 360px;
+    z-index: 20;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 16px rgba(0,230,118,0.3), 0 4px 16px rgba(0,0,0,0.6);
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Grandkids panel */
+  .grandkids-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .gk-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.7rem;
+    color: var(--green-light);
+    line-height: 1.2;
+  }
+
+  .gk-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #2e5a2e;
+    object-fit: cover;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d2a0d;
+    overflow: hidden;
+  }
+
+  .gk-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .gk-name {
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.68rem;
+    color: #b9f6ca;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70px;
+  }
+
+  /* Grandma head preview */
+  .babicka-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid var(--green);
+    object-fit: cover;
+    margin: 6px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    background: #0d2a0d;
+    overflow: hidden;
+    box-shadow: 0 0 12px rgba(0,230,118,0.4);
+  }
+
+  .babicka-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .keys-hint {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #3a5a3a;
+    margin-top: 8px;
+  }
+
+  .death-emoji {
+    font-size: 3rem;
+    animation: bounce 0.5s infinite alternate;
+  }
+
+  @keyframes bounce {
+    from { transform: scale(1); }
+    to { transform: scale(1.15) rotate(5deg); }
+  }
+
+  .tip-box {
+    font-size: 0.75rem;
+    color: #5a8a5a;
+    line-height: 1.7;
+  }
+  .tip-box b { color: var(--green-light); }
+</style>
+</head>
+<body>
+
+<h1>🐍 Babiččin Had</h1>
+<p class="subtitle">Narozeninová hra pro tu nejlepší babičku! 🎂</p>
+
+<div class="game-container">
+
+  <!-- LEFT PANEL -->
+  <div class="side-panel">
+    <div class="panel-box">
+      <h3>Skóre</h3>
+      <div class="score-val" id="scoreDisplay">0</div>
+    </div>
+    <div class="panel-box">
+      <h3>Rekord</h3>
+      <div class="highscore-val" id="highscoreDisplay">0</div>
+    </div>
+    <div class="panel-box">
+      <h3>Obtížnost</h3>
+      <div class="difficulty-btns">
+        <button class="diff-btn active" data-diff="easy"   onclick="setDifficulty(this)">😊 Lehká</button>
+        <button class="diff-btn"        data-diff="medium" onclick="setDifficulty(this)">😅 Střední</button>
+        <button class="diff-btn"        data-diff="hard"   onclick="setDifficulty(this)">😤 Těžká</button>
+      </div>
+    </div>
+    <div class="panel-box">
+      <h3>Legenda</h3>
+      <div class="legend">
+        <span>🍎</span> Ovoce &nbsp;+1 bod<br>
+        <span>🍰</span> Dort &nbsp;&nbsp;&nbsp;+3 body<br>
+        <span>👧</span> Vnouče +5 bodů<br>
+        <span>☠️</span> Konec hry
+      </div>
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrap">
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <div class="toast" id="toast"></div>
+
+    <div class="overlay" id="startOverlay">
+      <div class="death-emoji">🐍</div>
+      <h2>Babiččin Had</h2>
+      <p>Had = babička 👵<br>Sněz co nejvíc vnoučat a dobrůtek!<br><br>Ovládání: <strong>šipky ← → ↑ ↓</strong></p>
+      <button class="start-btn" onclick="startGame()">▶ Hrát!</button>
+    </div>
+
+    <div class="overlay" id="gameOverOverlay" style="display:none">
+      <div class="death-emoji" id="deathEmoji">💥</div>
+      <h2 id="deathTitle">Jejda!</h2>
+      <p id="deathMsg"></p>
+      <p style="color:var(--yellow);font-size:1.1rem;font-weight:800;" id="finalScore"></p>
+      <button class="start-btn" onclick="startGame()">🔄 Znovu!</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="side-panel">
+
+    <!-- Babička preview -->
+    <div class="panel-box">
+      <h3>👵 Babička</h3>
+      <div class="babicka-preview" id="babickaPreview">
+        <span id="babickaEmoji">👵</span>
+      </div>
+      <!-- <div style="font-size:0.7rem;color:#5a8a5a;margin-top:4px;">
+        Ulož <b style="color:#b9f6ca">babicka.jpg</b><br>do složky <b style="color:#b9f6ca">fotky/</b>
+      </div> -->
+    </div>
+
+    <!-- Vnoučata -->
+    <div class="panel-box" style="padding:12px;">
+      <h3>Vnoučata a zvířata </h3>
+      <div class="grandkids-grid" id="grandkidsGrid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- Tipy -->
+    <div class="panel-box">
+      <h3>Tipy 💡</h3>
+      <div class="tip-box">
+        <b>Dort</b> = 3× více!<br>
+        <b>Vnouče</b> = 5× více!<br>
+        <b>P</b> = pauza<br>
+        <b>Větší had</b> = vyšší skóre!
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p class="keys-hint">← → ↑ ↓ pro pohyb · P pro pauzu</p>
+
+<script>
+// ============================================================
+//  ★  JMÉNA VNOUČAT – sem zapiš jména babiččiných vnoučat  ★
+// ============================================================
+const GRANDKIDS = [
+  { name: 'Pepča',   emoji: '👧', color: '#ff69b4' },
+  { name: 'Ondra',   emoji: '👦', color: '#4fc3f7' },
+  { name: 'Jáchym', emoji: '👧', color: '#f48fb1' },
+  { name: 'Ema',   emoji: '👦', color: '#81d4fa' },
+  { name: 'Cindy', emoji: '👧', color: '#ce93d8' },
+  { name: 'Lůďa',  emoji: '👦', color: '#80cbc4' },
+  // Přidej nebo odeber řádky dle potřeby (max 10):
+  // { name: 'Jméno', emoji: '👧', color: '#barva' },
+];
+
+// ============================================================
+//  Načítání fotek ze složky fotky/
+//  (hra zkouší načíst soubor – pokud neexistuje, použije emoji)
+// ============================================================
+let grandmaImg = null;
+const grandkidImgs = new Array(GRANDKIDS.length).fill(null);
+
+function tryLoadImage(src, onSuccess) {
+  const img = new Image();
+  img.onload = () => onSuccess(img);
+  img.onerror = () => {}; // tiše selže, použije se emoji
+  img.src = src;
+}
+
+// Načíst babičku
+tryLoadImage('fotky/babicka.jpg', img => {
+  grandmaImg = img;
+  // Ukázat v preview
+  const preview = document.getElementById('babickaPreview');
+  preview.innerHTML = `<img src="fotky/babicka.jpg" alt="Babička">`;
+  if (typeof draw === 'function') draw();
+});
+// Zkus i .png / .jpeg
+tryLoadImage('fotky/babicka.png', img => { if (!grandmaImg) { grandmaImg = img; document.getElementById('babickaPreview').innerHTML = `<img src="fotky/babicka.png" alt="Babička">`; } });
+
+// Načíst vnoučata
+GRANDKIDS.forEach((gk, i) => {
+  const n = i + 1;
+  ['jpg','jpeg','png','webp'].forEach(ext => {
+    tryLoadImage(`fotky/vnouce${n}.${ext}`, img => {
+      if (!grandkidImgs[i]) {
+        grandkidImgs[i] = img;
+        renderGrandkidsPanel();
+      }
+    });
+  });
+});
+
+// ============================================================
+//  Panel vnoučat
+// ============================================================
+function renderGrandkidsPanel() {
+  const grid = document.getElementById('grandkidsGrid');
+  grid.innerHTML = GRANDKIDS.map((gk, i) => {
+    const imgSrc = grandkidImgs[i] ? grandkidImgs[i].src : null;
+    const avatar = imgSrc
+      ? `<div class="gk-avatar"><img src="${imgSrc}" alt="${gk.name}"></div>`
+      : `<div class="gk-avatar">${gk.emoji}</div>`;
+    return `<div class="gk-item">${avatar}<div class="gk-name">${gk.name}</div></div>`;
+  }).join('');
+}
+renderGrandkidsPanel();
+
+// ============================================================
+//  Herní konstanty
+// ============================================================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const CELL = 20;
+const COLS = canvas.width / CELL;
+const ROWS = canvas.height / CELL;
+
+// Rychlosti (ms / tik) – větší číslo = pomalejší
+const speeds = { easy: 220, medium: 130, hard: 70 };
+
+let snake, dir, nextDir, foods, score, highscore = 0, gameLoopId, paused;
+let difficulty = 'easy';
+
+// ============================================================
+//  Hlášky
+// ============================================================
+const msgs = {
+  fruit: [
+    '🍎 Mňam! To bylo dobré!',
+    '🍊 Vitamínky pro babičku!',
+    '🍇 Ach, jak lahodné!',
+    '😋 Ještě bych si dala!',
+    '🌿 Zdravá babička je šťastná babička!',
+    '🍓 Jahůdky! Jako od vnoučat ze zahrádky!',
+  ],
+  cake: [
+    '🍰 Ach ten dort! Jako od Ivanky!',
+    '🎂 To jsou kalorie… ale stojí za to!',
+    '😍 Takhle by měl vypadat každý dort!',
+    '🍰 Kdybych věděla, kde pekli takové dorty!',
+    '🎉 Dort k narozeninám? Ano prosím!',
+  ],
+  grandkid: name => [
+    `👧 ${name}! Pojď tady k babičce! Hihihi!`,
+    `💕 ${name} je ta nejmilejší na světě!`,
+    `🎉 ${name}! Konečně jsi přišla/přišel na návštěvu!`,
+    `😄 ${name}, máš tady u babičky vždy místo!`,
+    `🤗 ${name}! Dám ti pusu, ty moje zlatíčko!`,
+    `🥰 Ách, ${name}! Babička tě zbožňuje!`,
+  ],
+  wall: [
+    '🧱 Ježíšmarjá!',
+    '💥 Sakra! Tak tudy to nepůjde!',
+    '😤 Kdo tam postavil tu zeď?!',
+    '🤦 Ach jo, zas jsem se nepodívala kam jdu…',
+    '😵 Já myslela, že to jsou dveře!',
+    '🧱 Zeď! Hlavou zeď neprorazíš!',
+    '😂 No to jsem tedy šikovná… ',
+  ],
+  tail: [
+    '🐍 Au, to mám ostré zuby!',
+    '😂 Hahaha! Sama sebe jsem chytila!',
+    '🤭 Jejda! To byl asi můj vlastní ocas…',
+    '😅 No tohle… Říkali mi, ať si dám pozor na sebe!',
+    '🐍 Ocas! To by se mi vnoučata smála!',
+  ],
+};
+
+const randMsg = arr => arr[Math.floor(Math.random() * arr.length)];
+
+// ============================================================
+//  Obtížnost
+// ============================================================
+function setDifficulty(btn) {
+  difficulty = btn.dataset.diff;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ============================================================
+//  Inicializace hry
+// ============================================================
+function initGame() {
+  snake = [{ x: 12, y: 12 }, { x: 11, y: 12 }, { x: 10, y: 12 }];
+  dir = { x: 1, y: 0 };
+  nextDir = { x: 1, y: 0 };
+  foods = [];
+  score = 0;
+  paused = false;
+  updateScore();
+  spawnFood();
+  spawnFood();
+  spawnFood();
+}
+
+// ============================================================
+//  Jídlo
+// ============================================================
+const FRUITS = ['🍎','🍊','🍋','🍇','🍓','🍑','🫐','🍒'];
+
+function spawnFood() {
+  if (foods.length >= 5) return;
+  let pos, tries = 0;
+  do {
+    pos = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
+    tries++;
+  } while (tries < 100 && (
+    snake.some(s => s.x === pos.x && s.y === pos.y) ||
+    foods.some(f => f.x === pos.x && f.y === pos.y)
+  ));
+
+  const rand = Math.random();
+  let type = rand < 0.55 ? 'apple' : rand < 0.75 ? 'cake' : 'grandkid';
+  let data;
+
+  if (type === 'apple') {
+    data = { emoji: FRUITS[Math.floor(Math.random() * FRUITS.length)], points: 1, color: '#00e676', glowColor: '#69f0ae' };
+  } else if (type === 'cake') {
+    data = { emoji: '🍰', points: 3, color: '#ff9800', glowColor: '#ffcc02' };
+  } else {
+    const gk = GRANDKIDS[Math.floor(Math.random() * GRANDKIDS.length)];
+    const idx = GRANDKIDS.indexOf(gk);
+    data = { emoji: gk.emoji, points: 5, color: gk.color, glowColor: gk.color, name: gk.name, gkIndex: idx };
+  }
+
+  foods.push({ ...pos, type, ...data });
+}
+
+// ============================================================
+//  Herní smyčka
+// ============================================================
+let waitingForStart = false;
+
+function startGame() {
+  document.getElementById('startOverlay').style.display = 'none';
+  document.getElementById('gameOverOverlay').style.display = 'none';
+  if (gameLoopId) clearInterval(gameLoopId);
+  initGame();
+  waitingForStart = true;
+  draw();
+  showToast('⬆️ Stiskni šipku a hra začne!');
+}
+
+function tick() {
+  if (paused) return;
+  dir = { ...nextDir };
+  const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+  if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) { gameOver('wall'); return; }
+  if (snake.some(s => s.x === head.x && s.y === head.y)) { gameOver('tail'); return; }
+
+  snake.unshift(head);
+
+  const fi = foods.findIndex(f => f.x === head.x && f.y === head.y);
+  if (fi !== -1) {
+    const food = foods[fi];
+    score += food.points;
+    updateScore();
+    foods.splice(fi, 1);
+    const msg = food.type === 'apple' ? randMsg(msgs.fruit)
+              : food.type === 'cake'  ? randMsg(msgs.cake)
+              : randMsg(msgs.grandkid(food.name));
+    showToast(msg);
+    spawnFood();
+  } else {
+    snake.pop();
+  }
+  draw();
+}
+
+// ============================================================
+//  Game over
+// ============================================================
+function gameOver(reason) {
+  clearInterval(gameLoopId);
+  if (score > highscore) {
+    highscore = score;
+    document.getElementById('highscoreDisplay').textContent = highscore;
+  }
+  const ov = document.getElementById('gameOverOverlay');
+  document.getElementById('deathEmoji').textContent = reason === 'wall' ? '🧱' : '🐍';
+  document.getElementById('deathTitle').textContent  = reason === 'wall' ? 'Do zdi!' : 'Ach joj!';
+  document.getElementById('deathMsg').textContent    = reason === 'wall' ? randMsg(msgs.wall) : randMsg(msgs.tail);
+  document.getElementById('finalScore').textContent  = `Skóre: ${score} bodů 🌟`;
+  ov.style.display = 'flex';
+  draw();
+}
+
+function updateScore() {
+  document.getElementById('scoreDisplay').textContent = score;
+  if (score > highscore) {
+    highscore = score;
+    document.getElementById('highscoreDisplay').textContent = highscore;
+  }
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ============================================================
+//  Kreslení
+// ============================================================
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Mřížka
+  ctx.strokeStyle = 'rgba(0,200,83,0.06)';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x <= COLS; x++) { ctx.beginPath(); ctx.moveTo(x*CELL,0); ctx.lineTo(x*CELL,canvas.height); ctx.stroke(); }
+  for (let y = 0; y <= ROWS; y++) { ctx.beginPath(); ctx.moveTo(0,y*CELL); ctx.lineTo(canvas.width,y*CELL); ctx.stroke(); }
+
+  // Tělo hada – výrazná zelená s gradientem
+  for (let i = snake.length - 1; i >= 1; i--) {
+    const seg = snake[i];
+    const ratio = i / snake.length;
+    // Jasná zelená → tmavší ke konci ocasu
+    const r = Math.round(0 + ratio * 20);
+    const g = Math.round(230 - ratio * 80);
+    const b = Math.round(118 - ratio * 60);
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    roundRect(ctx, seg.x*CELL+1, seg.y*CELL+1, CELL-2, CELL-2, 5);
+    ctx.fill();
+
+    // Lesk
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    roundRect(ctx, seg.x*CELL+2, seg.y*CELL+2, CELL-10, 4, 2);
+    ctx.fill();
+  }
+
+  // Hlava hada (babička)
+  const head = snake[0];
+  if (grandmaImg) {
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, head.x*CELL, head.y*CELL, CELL, CELL, 7);
+    ctx.clip();
+    ctx.drawImage(grandmaImg, head.x*CELL, head.y*CELL, CELL, CELL);
+    ctx.restore();
+    // Zelený obrys kolem hlavy
+    ctx.strokeStyle = '#00e676';
+    ctx.lineWidth = 2;
+    roundRect(ctx, head.x*CELL+1, head.y*CELL+1, CELL-2, CELL-2, 6);
+    ctx.stroke();
+  } else {
+    ctx.font = `${CELL+2}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('👵', head.x*CELL + CELL/2, head.y*CELL + CELL/2 + 1);
+  }
+
+  // Jídlo – offscreen canvas zajistí, že blur se nikdy nedotkne emoji
+  const offscreen = document.createElement('canvas');
+  offscreen.width = CELL;
+  offscreen.height = CELL;
+  const octx = offscreen.getContext('2d');
+
+  foods.forEach(food => {
+    const cx = food.x*CELL + CELL/2;
+    const cy = food.y*CELL + CELL/2;
+
+    // 1) Glow kroužek na hlavním canvasu (blur zde nevadí)
+    ctx.save();
+    ctx.strokeStyle = food.glowColor || food.color;
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = food.glowColor || food.color;
+    ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.arc(cx, cy, CELL/2 - 0.5, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+
+    // 2) Emoji / fotka ostře na offscreen canvasu – žádný blur zde nikdy není
+    octx.clearRect(0, 0, CELL, CELL);
+
+    // Bílé pozadí uvnitř kruhu
+    octx.beginPath();
+    octx.arc(CELL/2, CELL/2, CELL/2 - 1, 0, Math.PI*2);
+    octx.fillStyle = 'rgba(255,255,255,0.60)';
+    octx.fill();
+
+    if (food.type === 'grandkid' && grandkidImgs[food.gkIndex]) {
+      octx.save();
+      octx.beginPath();
+      octx.arc(CELL/2, CELL/2, CELL/2 - 1, 0, Math.PI*2);
+      octx.clip();
+      octx.drawImage(grandkidImgs[food.gkIndex], 1, 1, CELL-2, CELL-2);
+      octx.restore();
+    } else {
+      octx.font = `${CELL + 2}px serif`;
+      octx.textAlign = 'center';
+      octx.textBaseline = 'middle';
+      octx.fillText(food.emoji, CELL/2, CELL/2 + 1);
+    }
+
+    // 3) Překopírovat offscreen na hlavní canvas – drawImage nemá blur
+    ctx.drawImage(offscreen, food.x*CELL, food.y*CELL);
+  });
+
+  // Pauza
+  if (paused) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#b2ff59';
+    ctx.font = 'bold 42px Baloo 2, cursive';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⏸ PAUZA', canvas.width/2, canvas.height/2);
+    ctx.font = '18px Nunito, sans-serif';
+    ctx.fillStyle = '#69f0ae';
+    ctx.fillText('Stiskni P pro pokračování', canvas.width/2, canvas.height/2 + 44);
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+// ============================================================
+//  Ovládání
+// ============================================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'p' || e.key === 'P') { paused = !paused; draw(); return; }
+  const map = { ArrowUp:{x:0,y:-1}, ArrowDown:{x:0,y:1}, ArrowLeft:{x:-1,y:0}, ArrowRight:{x:1,y:0} };
+  const d = map[e.key];
+  if (!d) return;
+  e.preventDefault();
+  if (!(d.x === -dir.x && d.y === -dir.y)) nextDir = d;
+  // První šipka po kliknutí na Hrát spustí časovač
+  if (waitingForStart) {
+    waitingForStart = false;
+    gameLoopId = setInterval(tick, speeds[difficulty]);
+  }
+});
+
+// ============================================================
+//  Úvodní kreslení
+// ============================================================
+draw();
+</script>
+</body>
+</html>
